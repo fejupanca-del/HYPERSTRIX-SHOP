@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperstrix Hub | Portal Multitienda y Comparador Gamer Avanzado</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        rogdark: '#0a0a0c',
+                        rogcard: '#121218',
+                        rogpurple: '#8b5cf6',
+                        rogred: '#ef4444',
+                        rogborder: '#27272a'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap');
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #0a0a0c;
+            color: #f4f4f5;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Interactive Mouse Spotlight Glow Cards */
+        .rog-glow-card {
+            position: relative;
+            background: #121218;
+            border: 1px solid #27272a;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
+        }
+
+        .rog-glow-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(139, 92, 246, 0.15), rgba(239, 68, 68, 0.05) 40%, transparent 80%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .rog-glow-card:hover::before {
+            opacity: 1;
+        }
+
+        .rog-glow-card:hover {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.25);
+            transform: translateY(-4px);
+        }
+
+        .rog-badge {
+            background: linear-gradient(135deg, #8b5cf6, #ef4444);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0c; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+    </style>
+</head>
+<body class="bg-rogdark text-zinc-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-gradient-to-r from-purple-900 via-zinc-900 to-red-900 text-xs py-1.5 px-4 text-center font-orbitron tracking-wider border-b border-zinc-800 flex justify-center items-center gap-4">
+        <span><i class="fa-solid fa-bolt text-purple-400 mr-1"></i> SOPORTE GLOBAL: <a href="mailto:fejupanca@gmail.com" class="underline text-red-400 hover:text-white transition">fejupanca@gmail.com</a></span>
+        <span class="hidden md:inline">|</span>
+        <span class="hidden md:inline"><i class="fa-solid fa-shield-halved text-red-400 mr-1"></i> +150 PRODUCTOS CON ENLACES DIRECTOS VERIFICADOS</span>
+    </div>
+
+    <!-- Navbar / Header -->
+    <header class="sticky top-0 z-50 bg-rogdark/90 backdrop-blur-md border-b border-rogborder">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="relative w-12 h-12 rounded-lg overflow-hidden border border-purple-500 shadow-[0_0_15px_rgba(139,92,246,0.5)] flex items-center justify-center bg-zinc-950">
+                    <i class="fa-solid fa-microchip text-purple-400 text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-black font-orbitron tracking-wider bg-gradient-to-r from-purple-400 via-white to-red-500 bg-clip-text text-transparent">HYPERSTRIX HUB</span>
+                    <span class="block text-[10px] text-zinc-400 tracking-widest font-semibold">DIRECT PRODUCT COMPARATOR</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="hidden lg:flex items-center space-x-6 text-sm font-semibold tracking-wide font-orbitron">
+                <button onclick="switchTab('home')" class="nav-btn text-purple-400 hover:text-white transition"><i class="fa-solid fa-house mr-1"></i> INICIO</button>
+                <button onclick="switchTab('catalog')" class="nav-btn text-zinc-300 hover:text-purple-400 transition"><i class="fa-solid fa-microchip mr-1"></i> CATÁLOGO MASIVO (+150)</button>
+                <button onclick="switchTab('compare')" class="nav-btn text-zinc-300 hover:text-purple-400 transition"><i class="fa-solid fa-scale-balanced mr-1"></i> COMPARADOR</button>
+                <button onclick="switchTab('stores')" class="nav-btn text-zinc-300 hover:text-purple-400 transition"><i class="fa-solid fa-store mr-1"></i> TIENDAS</button>
+            </nav>
+
+            <!-- Actions -->
+            <div class="flex items-center space-x-4">
+                <button onclick="openCartModal()" class="relative bg-zinc-900 border border-purple-500/50 hover:border-purple-400 p-2.5 rounded-lg text-purple-400 hover:text-white transition shadow-[0_0_10px_rgba(139,92,246,0.2)]">
+                    <i class="fa-solid fa-cart-shopping text-lg"></i>
+                    <span id="cart-badge" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Hero Banner -->
+    <section class="relative py-16 px-4 bg-gradient-to-b from-purple-950/20 via-rogdark to-rogdark border-b border-rogborder">
+        <div class="max-w-7xl mx-auto text-center relative z-10">
+            <div class="inline-block px-4 py-1.5 rounded-full bg-purple-900/40 border border-purple-500/30 text-purple-300 text-xs font-orbitron font-bold tracking-widest mb-4 shadow-[0_0_15px_rgba(139,92,246,0.2)]">
+                🎯 INVENTARIO EXPANDIDO: +30 OPCIONES POR CATEGORÍA
+            </div>
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black font-orbitron tracking-tight mb-6 max-w-5xl mx-auto leading-tight">
+                Hardware de Élite con <span class="bg-gradient-to-r from-purple-400 via-red-400 to-pink-500 bg-clip-text text-transparent">Stock Directo y Verificado</span>
+            </h1>
+            <p class="text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto mb-8 font-medium">
+                Explora más de 150 componentes reales con enlaces directos a Amazon, Best Buy, Speed Logic y Alkosto.
+            </p>
+
+            <!-- Search Bar Principal -->
+            <div class="max-w-3xl mx-auto bg-zinc-900/90 border border-purple-500/40 p-3 rounded-2xl shadow-[0_0_30px_rgba(139,92,246,0.2)] flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-purple-400"></i>
+                    <input type="text" id="global-search-input" placeholder="Busca RTX 5090, Ryzen 9, DDR5..." class="w-full bg-zinc-950 text-white pl-12 pr-4 py-3 rounded-xl border border-zinc-800 focus:outline-none focus:border-purple-500 text-sm font-semibold">
+                </div>
+                <select id="global-category-select" class="bg-zinc-950 text-zinc-300 px-4 py-3 rounded-xl border border-zinc-800 focus:outline-none focus:border-purple-500 text-sm font-semibold font-orbitron">
+                    <option value="all">Todas las Categorías</option>
+                    <option value="gpu">Tarjetas Gráficas (+30)</option>
+                    <option value="cpu">Procesadores Ryzen (+30)</option>
+                    <option value="ram">Memorias RAM (+30)</option>
+                    <option value="ssd">SSDs NVMe (+30)</option>
+                    <option value="cooler">Coolers & AIO (+30)</option>
+                </select>
+                <button onclick="executeGlobalSearch()" class="bg-gradient-to-r from-purple-600 to-red-600 hover:from-purple-500 hover:to-red-500 text-white font-orbitron font-bold px-8 py-3 rounded-xl transition shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                    BUSCAR
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+
+        <!-- TAB HOME -->
+        <div id="tab-home" class="tab-content space-y-16">
+            <div>
+                <h2 class="text-xl sm:text-2xl font-black font-orbitron mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-red-500"></i> CATEGORÍAS PRINCIPALES (+30 PRODUCTOS CADA UNA)
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="rog-glow-card rounded-xl p-6 cursor-pointer" onclick="selectCatAndSwitch('gpu')">
+                        <div class="h-40 rounded-lg overflow-hidden mb-4 relative bg-zinc-950 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80" alt="GPUs" class="w-full h-full object-cover opacity-80">
+                            <span class="absolute top-2 right-2 rog-badge text-[10px] px-2 py-0.5 rounded">30+ Modelos</span>
+                        </div>
+                        <h3 class="font-orbitron font-bold text-lg mb-1">Tarjetas Gráficas</h3>
+                        <p class="text-xs text-zinc-400 mb-4">Serie RTX 50, RTX 40, RX 7000 y ediciones ROG Strix.</p>
+                        <span class="text-purple-400 text-xs font-bold font-orbitron flex items-center gap-1">Ver Catálogo <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+                    </div>
+
+                    <div class="rog-glow-card rounded-xl p-6 cursor-pointer" onclick="selectCatAndSwitch('cpu')">
+                        <div class="h-40 rounded-lg overflow-hidden mb-4 relative bg-zinc-950 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80" alt="CPUs" class="w-full h-full object-cover opacity-80">
+                            <span class="absolute top-2 right-2 rog-badge text-[10px] px-2 py-0.5 rounded">30+ Modelos</span>
+                        </div>
+                        <h3 class="font-orbitron font-bold text-lg mb-1">Procesadores Ryzen</h3>
+                        <p class="text-xs text-zinc-400 mb-4">Ryzen 9000, 7000 X3D y series completas AM5.</p>
+                        <span class="text-purple-400 text-xs font-bold font-orbitron flex items-center gap-1">Ver Catálogo <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+                    </div>
+
+                    <div class="rog-glow-card rounded-xl p-6 cursor-pointer" onclick="selectCatAndSwitch('ram')">
+                        <div class="h-40 rounded-lg overflow-hidden mb-4 relative bg-zinc-950 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80" alt="RAM" class="w-full h-full object-cover opacity-80">
+                            <span class="absolute top-2 right-2 rog-badge text-[10px] px-2 py-0.5 rounded">30+ Modelos</span>
+                        </div>
+                        <h3 class="font-orbitron font-bold text-lg mb-1">Memorias RAM</h3>
+                        <p class="text-xs text-zinc-400 mb-4">Kits DDR5 extremos de Corsair, Kingston, G.Skill.</p>
+                        <span class="text-purple-400 text-xs font-bold font-orbitron flex items-center gap-1">Ver Catálogo <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+                    </div>
+
+                    <div class="rog-glow-card rounded-xl p-6 cursor-pointer" onclick="selectCatAndSwitch('cooler')">
+                        <div class="h-40 rounded-lg overflow-hidden mb-4 relative bg-zinc-950 flex items-center justify-center">
+                            <img src="https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80" alt="Coolers" class="w-full h-full object-cover opacity-80">
+                            <span class="absolute top-2 right-2 rog-badge text-[10px] px-2 py-0.5 rounded">30+ Modelos</span>
+                        </div>
+                        <h3 class="font-orbitron font-bold text-lg mb-1">Coolers & AIO</h3>
+                        <p class="text-xs text-zinc-400 mb-4">Refrigeración líquida ROG Ryujin y disipadores ARGB.</p>
+                        <span class="text-purple-400 text-xs font-bold font-orbitron flex items-center gap-1">Ver Catálogo <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CATALOG -->
+        <div id="tab-catalog" class="tab-content hidden space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-zinc-900/60 p-4 rounded-xl border border-rogborder">
+                <div>
+                    <h2 class="text-2xl font-black font-orbitron">CATÁLOGO MASIVO DE HARDWARE (+150 PRODUCTOS)</h2>
+                    <p class="text-xs text-zinc-400">Cada componente cuenta con su enlace directo a la tienda correspondiente.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <select id="catalog-filter-cat" onchange="renderCatalog()" class="bg-zinc-950 text-zinc-300 text-xs font-orbitron px-3 py-2 rounded-lg border border-zinc-800">
+                        <option value="all">Todas las Categorías</option>
+                        <option value="gpu">Tarjetas Gráficas</option>
+                        <option value="cpu">Procesadores Ryzen</option>
+                        <option value="ram">Memorias RAM</option>
+                        <option value="ssd">SSDs NVMe</option>
+                        <option value="cooler">Coolers & AIO</option>
+                    </select>
+                    <select id="catalog-filter-store" onchange="renderCatalog()" class="bg-zinc-950 text-zinc-300 text-xs font-orbitron px-3 py-2 rounded-lg border border-zinc-800">
+                        <option value="all">Todas las Tiendas</option>
+                        <option value="Amazon">Amazon</option>
+                        <option value="Best Buy">Best Buy</option>
+                        <option value="Speed Logic">Speed Logic</option>
+                        <option value="Alkosto">Alkosto</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </div>
+
+        <!-- TAB COMPARE -->
+        <div id="tab-compare" class="tab-content hidden space-y-8">
+            <div class="bg-zinc-900/60 p-6 rounded-xl border border-rogborder">
+                <h2 class="text-2xl font-black font-orbitron mb-2"><i class="fa-solid fa-scale-balanced text-purple-400 mr-2"></i>COMPARADOR DE HARDWARE</h2>
+                <p class="text-sm text-zinc-400 mb-6">Selecciona dos componentes para comparar sus especificaciones lado a lado.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <label class="block text-xs font-orbitron text-purple-400 mb-2">PRODUCTO 1</label>
+                        <select id="compare-select-1" onchange="updateComparison()" class="w-full bg-zinc-950 text-white p-3 rounded-lg border border-zinc-800 text-sm font-semibold">
+                            <option value="">Seleccionar componente...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-orbitron text-purple-400 mb-2">PRODUCTO 2</label>
+                        <select id="compare-select-2" onchange="updateComparison()" class="w-full bg-zinc-950 text-white p-3 rounded-lg border border-zinc-800 text-sm font-semibold">
+                            <option value="">Seleccionar componente...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="comparison-result" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-zinc-950 p-6 rounded-xl border border-zinc-800 text-center text-zinc-500 font-orbitron text-sm">Selecciona el producto 1</div>
+                    <div class="bg-zinc-950 p-6 rounded-xl border border-zinc-800 text-center text-zinc-500 font-orbitron text-sm">Selecciona el producto 2</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB STORES -->
+        <div id="tab-stores" class="tab-content hidden space-y-8">
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <h2 class="text-2xl font-black font-orbitron mb-2">PORTAL DE TIENDAS ASOCIADAS</h2>
+                <p class="text-xs text-zinc-400">Acceso directo a distribuidores oficiales globales y locales.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="rog-glow-card p-6 rounded-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4"><span class="font-orbitron font-bold text-lg">Amazon</span><i class="fa-brands fa-amazon text-2xl text-orange-400"></i></div>
+                        <p class="text-xs text-zinc-400 mb-4">Envíos globales y stock certificado.</p>
+                    </div>
+                    <a href="https://www.amazon.com" target="_blank" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-center py-2.5 rounded-lg text-xs font-orbitron font-bold text-purple-400 block">ENTRAR <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="rog-glow-card p-6 rounded-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4"><span class="font-orbitron font-bold text-lg">Best Buy</span><i class="fa-solid fa-shop text-2xl text-blue-400"></i></div>
+                        <p class="text-xs text-zinc-400 mb-4">Componentes de gama alta y ROG.</p>
+                    </div>
+                    <a href="https://www.bestbuy.com" target="_blank" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-center py-2.5 rounded-lg text-xs font-orbitron font-bold text-purple-400 block">ENTRAR <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="rog-glow-card p-6 rounded-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4"><span class="font-orbitron font-bold text-lg">Speed Logic</span><i class="fa-solid fa-bolt text-2xl text-purple-400"></i></div>
+                        <p class="text-xs text-zinc-400 mb-4">Ensambles y partes en Colombia.</p>
+                    </div>
+                    <a href="https://speedlogic.com.co" target="_blank" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-center py-2.5 rounded-lg text-xs font-orbitron font-bold text-purple-400 block">ENTRAR <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                </div>
+                <div class="rog-glow-card p-6 rounded-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4"><span class="font-orbitron font-bold text-lg">Alkosto</span><i class="fa-solid fa-cart-shopping text-2xl text-yellow-400"></i></div>
+                        <p class="text-xs text-zinc-400 mb-4">Tecnología y gran superficie.</p>
+                    </div>
+                    <a href="https://www.alkosto.com" target="_blank" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-center py-2.5 rounded-lg text-xs font-orbitron font-bold text-purple-400 block">ENTRAR <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-zinc-950 border-t border-rogborder py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-zinc-500 font-orbitron">
+            &copy; 2026 HYPERSTRIX HUB. Soporte técnico: fejupanca@gmail.com
+        </div>
+    </footer>
+
+    <!-- CART MODAL -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-purple-500/50 rounded-2xl max-w-lg w-full p-6 relative">
+            <button onclick="closeCartModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="font-orbitron text-xl font-bold mb-4">CARRITO MULTITIENDA</h3>
+            <div id="cart-items-container" class="space-y-3 max-h-60 overflow-y-auto mb-4"></div>
+            <div class="border-t border-zinc-800 pt-4 flex justify-between items-center mb-6">
+                <span class="font-orbitron text-sm">TOTAL:</span>
+                <span id="cart-total" class="font-orbitron text-lg font-bold text-purple-400">$0.00</span>
+            </div>
+            <button onclick="closeCartModal()" class="w-full bg-zinc-800 text-white font-orbitron font-bold py-3 rounded-xl">CERRAR</button>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Interactive Mouse Glow Tracking for Cards
+        document.addEventListener('mousemove', e => {
+            for (const card of document.querySelectorAll('.rog-glow-card')) {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            }
+        });
+
+        // 150+ Catálogo Masivo Real (30+ productos por categoría)
+        const products = [
+            // --- 30 Tarjetas Gráficas (GPU) ---
+            { id: 1, category: 'gpu', name: 'ASUS ROG Strix GeForce RTX 5090 OC Edition', brand: 'ASUS ROG / NVIDIA', price: 2399, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '32GB GDDR7, diseño térmico avanzado', url: 'https://www.amazon.com/s?k=ASUS+ROG+Strix+GeForce+RTX+5090' },
+            { id: 2, category: 'gpu', name: 'MSI GeForce RTX 5080 16GB Gaming Trio OC', brand: 'MSI / NVIDIA', price: 1199, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR7, TriFrozr 3', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=RTX+5080' },
+            { id: 3, category: 'gpu', name: 'Gigabyte AORUS GeForce RTX 4090 Master 24G', brand: 'Gigabyte', price: 1799, store: 'Amazon', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '24GB GDDR6X, refrigeración WINDFORCE', url: 'https://www.amazon.com/s?k=Gigabyte+AORUS+RTX+4090' },
+            { id: 4, category: 'gpu', name: 'ASUS TUF Gaming GeForce RTX 4080 Super OC', brand: 'ASUS TUF', price: 1049, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6X, Axial-tech fans', url: 'https://speedlogic.com.co/?s=RTX+4080+Super&post_type=product' },
+            { id: 5, category: 'gpu', name: 'AMD Radeon RX 7900 XTX Gaming OC 24GB', brand: 'AMD', price: 929, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '24GB GDDR6, arquitectura RDNA 3', url: 'https://www.amazon.com/s?k=RX+7900+XTX' },
+            { id: 6, category: 'gpu', name: 'MSI GeForce RTX 4070 Ti Super 16G Ventus 3X', brand: 'MSI', price: 799, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6X, DLSS 3.5', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=RTX+4070+Ti+Super' },
+            { id: 7, category: 'gpu', name: 'ASUS ROG Strix Radeon RX 7900 XT OC', brand: 'ASUS ROG', price: 849, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '20GB GDDR6, disipador ROG 2.5 ranuras', url: 'https://www.amazon.com/s?k=ROG+Strix+RX+7900+XT' },
+            { id: 8, category: 'gpu', name: 'Zotac Gaming GeForce RTX 4060 Ti 8GB', brand: 'Zotac', price: 379, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '8GB GDDR6, tamaño compacto', url: 'https://www.alkosto.com/search?text=RTX+4060' },
+            { id: 9, category: 'gpu', name: 'Sapphire Nitro+ AMD Radeon RX 7800 XT', brand: 'Sapphire', price: 519, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6, ARGB personalizable', url: 'https://www.amazon.com/s?k=Sapphire+RX+7800+XT' },
+            { id: 10, category: 'gpu', name: 'PNY GeForce RTX 4070 Super 12GB', brand: 'PNY', price: 589, store: 'Best Buy', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '12GB GDDR6X, triple ventilador', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=PNY+RTX+4070+Super' },
+            { id: 11, category: 'gpu', name: 'ASUS Dual GeForce RTX 4060 OC Edition', brand: 'ASUS', price: 299, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '8GB GDDR6, diseño de doble ventilador', url: 'https://speedlogic.com.co/?s=RTX+4060&post_type=product' },
+            { id: 12, category: 'gpu', name: 'Gigabyte GeForce RTX 4070 Eagle OC 12G', brand: 'Gigabyte', price: 549, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '12GB GDDR6X, sistema WINDFORCE', url: 'https://www.amazon.com/s?k=Gigabyte+RTX+4070+Eagle' },
+            { id: 13, category: 'gpu', name: 'AMD Radeon RX 7600 XT 16GB', brand: 'AMD', price: 329, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6, ideal para 1080p y 1440p', url: 'https://www.alkosto.com/search?text=RX+7600' },
+            { id: 14, category: 'gpu', name: 'MSI GeForce RTX 4050 Gaming 6G', brand: 'MSI', price: 249, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '6GB GDDR6, bajo consumo energético', url: 'https://www.amazon.com/s?k=RTX+4050' },
+            { id: 15, category: 'gpu', name: 'XFX Speedster MERC 310 AMD Radeon RX 7900 XT', brand: 'XFX', price: 779, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '20GB GDDR6, disipador negro sólido', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=XFX+RX+7900+XT' },
+            { id: 16, category: 'gpu', name: 'ASUS ROG Strix GeForce RTX 4070 Ti', brand: 'ASUS ROG', price: 899, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '12GB GDDR6X, iluminación Aura Sync', url: 'https://www.amazon.com/s?k=ROG+Strix+RTX+4070+Ti' },
+            { id: 17, category: 'gpu', name: 'PowerColor Hellhound AMD Radeon RX 7700 XT', brand: 'PowerColor', price: 419, store: 'Speed Logic', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '12GB GDDR6, ventiladores LED amatista', url: 'https://speedlogic.com.co/?s=RX+7700+XT&post_type=product' },
+            { id: 18, category: 'gpu', name: 'Intel Arc A770 Phantom Gaming 16GB OC', brand: 'Intel', price: 319, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6, codificación AV1 nativa', url: 'https://www.amazon.com/s?k=Intel+Arc+A770' },
+            { id: 19, category: 'gpu', name: 'ASYS TUF Gaming GeForce RTX 4070 Super', brand: 'ASUS TUF', price: 629, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '12GB GDDR6X, grado militar', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=TUF+RTX+4070+Super' },
+            { id: 20, category: 'gpu', name: 'Gigabyte GeForce RTX 4060 Ti Gaming OC 16G', brand: 'Gigabyte', price: 449, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6, ideal para IA y gaming', url: 'https://www.amazon.com/s?k=Gigabyte+RTX+4060+Ti+16GB' },
+            { id: 21, category: 'gpu', name: 'MSI GeForce RTX 4080 Super 16G Expert', brand: 'MSI', price: 1099, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6X, diseño en aluminio cepillado', url: 'https://www.alkosto.com/search?text=RTX+4080' },
+            { id: 22, category: 'gpu', name: 'Sapphire Pulse AMD Radeon RX 7600', brand: 'Sapphire', price: 269, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '8GB GDDR6, formato compacto', url: 'https://www.amazon.com/s?k=Sapphire+RX+7600' },
+            { id: 23, category: 'gpu', name: 'ASUS ROG Matrix Platinum GeForce RTX 4090', brand: 'ASUS ROG', price: 3199, store: 'Speed Logic', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: 'Liquid metal, 24GB GDDR6X edición coleccionista', url: 'https://speedlogic.com.co/?s=RTX+4090&post_type=product' },
+            { id: 24, category: 'gpu', name: 'PNY GeForce RTX 4060 8GB Verto Dual Fan', brand: 'PNY', price: 289, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '8GB GDDR6, diseño simplificado', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=PNY+RTX+4060' },
+            { id: 25, category: 'gpu', name: 'AMD Radeon RX 7900 M Mobile & Desktop', brand: 'AMD', price: 899, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '16GB VRAM, alto rendimiento energético', url: 'https://www.amazon.com/s?k=RX+7900' },
+            { id: 26, category: 'gpu', name: 'Zotac Gaming GeForce RTX 4070 Twin Edge', brand: 'Zotac', price: 529, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '12GB GDDR6X, diseño de doble ranura', url: 'https://www.alkosto.com/search?text=RTX+4070' },
+            { id: 27, category: 'gpu', name: 'Gigabyte GeForce RTX 4080 Super Gaming OC', brand: 'Gigabyte', price: 1029, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6X, refrigeración optimizada', url: 'https://www.amazon.com/s?k=Gigabyte+RTX+4080+Super' },
+            { id: 28, category: 'gpu', name: 'Intel Arc A580 Challenger 8GB OC', brand: 'Intel', price: 189, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '8GB GDDR6, excelente relación calidad-precio', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Intel+Arc+A580' },
+            { id: 29, category: 'gpu', name: 'MSI GeForce RTX 4070 Ti Ventus 3X 12G', brand: 'MSI', price: 749, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&auto=format&fit=crop&q=80', specs: '12GB GDDR6X, triple ventilador eficiente', url: 'https://www.amazon.com/s?k=MSI+RTX+4070+Ti+Ventus' },
+            { id: 30, category: 'gpu', name: 'ASUS ROG Strix GeForce RTX 4080 16GB', brand: 'ASUS ROG', price: 1299, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80', specs: '16GB GDDR6X, tope de gama generacional', url: 'https://speedlogic.com.co/?s=RTX+4080+ROG&post_type=product' },
+
+            // --- 30 Procesadores Ryzen (CPU) ---
+            { id: 31, category: 'cpu', name: 'AMD Ryzen 7 9800X3D 8-Core 16-Thread', brand: 'AMD', price: 479, store: 'Amazon', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, 96MB 3D V-Cache', url: 'https://www.amazon.com/s?k=AMD+Ryzen+7+9800X3D' },
+            { id: 32, category: 'cpu', name: 'AMD Ryzen 9 9950X 16-Core 32-Thread', brand: 'AMD', price: 649, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, Zen 5, hasta 5.7 GHz', url: 'https://speedlogic.com.co/?s=Ryzen+9+9950X&post_type=product' },
+            { id: 33, category: 'cpu', name: 'AMD Ryzen 9 7950X3D 16-Core Processor', brand: 'AMD', price: 599, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, 144MB de caché total', url: 'https://www.amazon.com/s?k=Ryzen+9+7950X3D' },
+            { id: 34, category: 'cpu', name: 'AMD Ryzen 7 7800X3D 8-Core Processor', brand: 'AMD', price: 389, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, el rey del gaming', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Ryzen+7+7800X3D' },
+            { id: 35, category: 'cpu', name: 'AMD Ryzen 9 9900X 12-Core 24-Thread', brand: 'AMD', price: 469, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, alto rendimiento multihilo', url: 'https://www.amazon.com/s?k=Ryzen+9+9900X' },
+            { id: 36, category: 'cpu', name: 'AMD Ryzen 5 9600X 6-Core 12-Thread', brand: 'AMD', price: 279, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, eficiencia energética superior', url: 'https://www.alkosto.com/search?text=Ryzen+5+9600X' },
+            { id: 37, category: 'cpu', name: 'AMD Ryzen 5 7600X 6-Core Processor', brand: 'AMD', price: 209, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, frecuencia base 4.7 GHz', url: 'https://www.amazon.com/s?k=Ryzen+5+7600X' },
+            { id: 38, category: 'cpu', name: 'AMD Ryzen 7 7700X 8-Core Processor', brand: 'AMD', price: 299, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, excelente para streaming y juegos', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Ryzen+7+7700X' },
+            { id: 39, category: 'cpu', name: 'AMD Ryzen 5 7600 (Con cooler Wraith Stealth)', brand: 'AMD', price: 189, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, incluye disipador de fábrica', url: 'https://www.amazon.com/s?k=Ryzen+5+7600' },
+            { id: 40, category: 'cpu', name: 'AMD Ryzen 9 7900X 12-Core Processor', brand: 'AMD', price: 419, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM5, 76MB de caché', url: 'https://speedlogic.com.co/?s=Ryzen+9+7900X&post_type=product' },
+            { id: 41, category: 'cpu', name: 'AMD Ryzen 7 5700X3D 8-Core AM4', brand: 'AMD', price: 219, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4, actualización ideal de gama alta', url: 'https://www.amazon.com/s?k=Ryzen+7+5700X3D' },
+            { id: 42, category: 'cpu', name: 'AMD Ryzen 5 5600X 6-Core AM4', brand: 'AMD', price: 139, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4, el procesador más vendido', url: 'https://www.alkosto.com/search?text=Ryzen+5+5600X' },
+            { id: 43, category: 'cpu', name: 'AMD Ryzen 9 5950X 16-Core AM4', brand: 'AMD', price: 379, store: 'Amazon', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4, máxima potencia en plataforma DDR4', url: 'https://www.amazon.com/s?k=Ryzen+9+5950X' },
+            { id: 44, category: 'cpu', name: 'AMD Ryzen 7 5800X3D 8-Core AM4', brand: 'AMD', price: 299, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4 con tecnología 3D V-Cache', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Ryzen+7+5800X3D' },
+            { id: 45, category: 'cpu', name: 'AMD Ryzen 5 5600 6-Core AM4', brand: 'AMD', price: 119, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4, excelente eficiencia y precio', url: 'https://www.amazon.com/s?k=Ryzen+5+5600' },
+            { id: 46, category: 'cpu', name: 'AMD Ryzen 7 8700G con Gráficos Radeon 780M', brand: 'AMD', price: 319, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'APU AM5 con IA integrada (NPU Ryzen AI)', url: 'https://speedlogic.com.co/?s=Ryzen+7+8700G&post_type=product' },
+            { id: 47, category: 'cpu', name: 'AMD Ryzen 5 8600G con Gráficos Radeon 760M', brand: 'AMD', price: 219, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'APU AM5 ideal para gaming sin tarjeta dedicada', url: 'https://www.amazon.com/s?k=Ryzen+5+8600G' },
+            { id: 48, category: 'cpu', name: 'AMD Ryzen 3 4100 4-Core AM4', brand: 'AMD', price: 79, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4 de entrada para oficinas', url: 'https://www.alkosto.com/search?text=Ryzen+3+4100' },
+            { id: 49, category: 'cpu', name: 'AMD Ryzen 9 5900X 12-Core AM4', brand: 'AMD', price: 289, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4 multitarea avanzada', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Ryzen+9+5900X' },
+            { id: 50, category: 'cpu', name: 'AMD Ryzen 7 5700G con Gráficos Radeon', brand: 'AMD', price: 179, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4 con gráficos integrados Vega 8', url: 'https://www.amazon.com/s?k=Ryzen+7+5700G' },
+            { id: 51, category: 'cpu', name: 'AMD Ryzen 5 5500 6-Core AM4', brand: 'AMD', price: 99, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4 económico', url: 'https://speedlogic.com.co/?s=Ryzen+5+5500&post_type=product' },
+            { id: 52, category: 'cpu', name: 'AMD Ryzen Threadripper 7960X 24-Core', brand: 'AMD', price: 1499, store: 'Amazon', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket sTR5 para estaciones de trabajo extremas', url: 'https://www.amazon.com/s?k=Threadripper+7960X' },
+            { id: 53, category: 'cpu', name: 'AMD Ryzen Threadripper PRO 7975WX', brand: 'AMD', price: 2499, store: 'Best Buy', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: '32 núcleos, soporte ECC octa-channel', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Threadripper+7975WX' },
+            { id: 54, category: 'cpu', name: 'AMD Ryzen 3 3300X 4-Core AM4', brand: 'AMD', price: 89, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4 rendimiento clásico', url: 'https://www.amazon.com/s?k=Ryzen+3+3300X' },
+            { id: 55, category: 'cpu', name: 'AMD Ryzen 5 4500 6-Core AM4', brand: 'AMD', price: 85, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Socket AM4 de bajo costo', url: 'https://www.alkosto.com/search?text=Ryzen+5+4500' },
+            { id: 56, category: 'cpu', name: 'AMD Ryzen 7 8700G Box', brand: 'AMD', price: 329, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Procesador con gráficos avanzados serie 8000', url: 'https://www.amazon.com/s?k=Ryzen+7+8700G' },
+            { id: 57, category: 'cpu', name: 'AMD Ryzen 5 7600X3D Special Edition', brand: 'AMD', price: 299, store: 'Best Buy', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: '6 núcleos con 3D V-Cache para gaming fluido', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Ryzen+5+7600X3D' },
+            { id: 58, category: 'cpu', name: 'AMD Ryzen 9 7900 12-Core AM5', brand: 'AMD', price: 399, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Versión de 65W de bajo consumo', url: 'https://www.amazon.com/s?k=Ryzen+9+7900' },
+            { id: 59, category: 'cpu', name: 'AMD Ryzen 7 7700 8-Core AM5 65W', brand: 'AMD', price: 279, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'Incluye cooler Wraith Prism con RGB', url: 'https://speedlogic.com.co/?s=Ryzen+7+7700&post_type=product' },
+            { id: 60, category: 'cpu', name: 'AMD Ryzen 5 3600 6-Core AM4 (Legendary)', brand: 'AMD', price: 89, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80', specs: 'El procesador histórico de gama media', url: 'https://www.amazon.com/s?k=Ryzen+5+3600' },
+
+            // --- 30 Memorias RAM (RAM) ---
+            { id: 61, category: 'ram', name: 'Corsair Dominator Titanium RGB 32GB (2x16GB) DDR5 6000MHz', brand: 'Corsair', price: 219, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'DDR5 EXPO, diseño intercambiable', url: 'https://www.amazon.com/s?k=Corsair+Dominator+Titanium+DDR5+6000' },
+            { id: 62, category: 'ram', name: 'Kingston Fury Renegade RGB 64GB DDR5 6400MHz', brand: 'Kingston', price: 329, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Kit de alto rendimiento para entusiastas', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Kingston+Fury+Renegade+DDR5' },
+            { id: 63, category: 'ram', name: 'G.Skill Trident Z5 Neo RGB 32GB DDR5 6000MHz CL30', brand: 'G.Skill', price: 129, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Optimizado para procesadores AMD Ryzen serie 7000/9000', url: 'https://www.amazon.com/s?k=Trident+Z5+Neo+6000MHz+CL30' },
+            { id: 64, category: 'ram', name: 'Corsair Vengeance RGB 32GB (2x16GB) DDR5 5600MHz', brand: 'Corsair', price: 109, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'DDR5 con iluminación panorámica', url: 'https://www.alkosto.com/search?text=Corsair+Vengeance+DDR5' },
+            { id: 65, category: 'ram', name: 'Kingston Fury Beast 16GB DDR5 5200MHz', brand: 'Kingston', price: 65, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Módulo de entrada confiable y estable', url: 'https://www.amazon.com/s?k=Kingston+Fury+Beast+DDR5+16GB' },
+            { id: 66, category: 'ram', name: 'TeamGroup T-Force Delta RGB DDR5 32GB 6000MHz', brand: 'TeamGroup', price: 115, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Diseño de iluminación ultra angular 120°', url: 'https://speedlogic.com.co/?s=T-Force+Delta+DDR5&post_type=product' },
+            { id: 67, category: 'ram', name: 'G.Skill Flare X5 Series 32GB DDR5 6000MHz CL32', brand: 'G.Skill', price: 119, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Perfil bajo sin iluminación, color negro mate', url: 'https://www.amazon.com/s?k=G.Skill+Flare+X5+32GB' },
+            { id: 68, category: 'ram', name: 'Corsair Vengeance LPX 32GB (2x16GB) DDR4 3200MHz', brand: 'Corsair', price: 74, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'DDR4 de bajo perfil, disipador de aluminio', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Corsair+LPX+32GB' },
+            { id: 69, category: 'ram', name: 'Kingston Fury Beast RGB 32GB DDR4 3600MHz', brand: 'Kingston', price: 89, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'DDR4 con efectos RGB personalizables', url: 'https://www.amazon.com/s?k=Kingston+Fury+Beast+DDR4' },
+            { id: 70, category: 'ram', name: 'Crucial RAM 16GB DDR5 4800MHz UDIMM', brand: 'Crucial', price: 49, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Memoria estándar para equipos empresariales', url: 'https://www.alkosto.com/search?text=Crucial+DDR5' },
+            { id: 71, category: 'ram', name: 'Thermaltake Toughram XG RGB D5 32GB 6000MHz', brand: 'Thermaltake', price: 139, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Diseño geométrico exclusivo con barra LED', url: 'https://www.amazon.com/s?k=Thermaltake+Toughram+DDR5' },
+            { id: 72, category: 'ram', name: 'Patriot Viper Venom DDR5 32GB 6200MHz', brand: 'Patriot', price: 109, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Disipador de alta eficiencia térmica', url: 'https://speedlogic.com.co/?s=Viper+Venom+DDR5&post_type=product' },
+            { id: 73, category: 'ram', name: 'ADATA XPG Lancer Blade RGB 32GB DDR5 6000MHz', brand: 'ADATA', price: 112, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Diseño compacto de perfil bajo con RGB', url: 'https://www.amazon.com/s?k=XPG+Lancer+Blade+DDR5' },
+            { id: 74, category: 'ram', name: 'Corsair Dominator Platinum RGB 64GB DDR5 5600MHz', brand: 'Corsair', price: 279, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Kit masivo para creadores profesionales', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Corsair+Dominator+64GB' },
+            { id: 75, category: 'ram', name: 'Silicon Power Value Gaming DDR4 16GB 3200MHz', brand: 'Silicon Power', price: 39, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Kit económico DDR4 de 2x8GB', url: 'https://www.amazon.com/s?k=Silicon+Power+DDR4+3200' },
+            { id: 76, category: 'ram', name: 'G.Skill Trident Z Royal RGB 32GB DDR4 3600MHz', brand: 'G.Skill', price: 149, store: 'Alkosto', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Barra de luz cristalina efecto joya', url: 'https://www.alkosto.com/search?text=Trident+Z+Royal' },
+            { id: 77, category: 'ram', name: 'Kingston Fury Impact 32GB DDR5 5600MHz SODIMM', brand: 'Kingston', price: 119, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Memoria RAM formato portátil / mini PC', url: 'https://www.amazon.com/s?k=Kingston+Fury+Impact+SODIMM' },
+            { id: 78, category: 'ram', name: 'TeamGroup T-Create Expert 64GB DDR5 6000MHz', brand: 'TeamGroup', price: 199, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Diseño profesional sobrio color negro', url: 'https://speedlogic.com.co/?s=T-Create+64GB&post_type=product' },
+            { id: 79, category: 'ram', name: 'Corsair Vengeance RGB Pro 32GB DDR4 3600MHz', brand: 'Corsair', price: 95, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'El clásico DDR4 con luces vibrantes', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Corsair+Vengeance+RGB+Pro' },
+            { id: 80, category: 'ram', name: 'PNY XLR8 Gaming Epic-X RGB 32GB DDR4 3200MHz', brand: 'PNY', price: 79, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Diseño agresivo y disipador optimizado', url: 'https://www.amazon.com/s?k=PNY+XLR8+DDR4' },
+            { id: 81, category: 'ram', name: 'G.Skill Ripjaws S5 32GB DDR5 5600MHz CL28', brand: 'G.Skill', price: 115, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Baja latencia para máximo rendimiento', url: 'https://www.amazon.com/s?k=Ripjaws+S5+32GB' },
+            { id: 82, category: 'ram', name: 'Crucial Pro RAM 32GB Kit DDR5 5600MHz', brand: 'Crucial', price: 99, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Estabilidad garantizada sin florituras', url: 'https://www.alkosto.com/search?text=Crucial+Pro+DDR5' },
+            { id: 83, category: 'ram', name: 'Kingston Fury Beast 8GB DDR4 2666MHz', brand: 'Kingston', price: 32, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Memoria económica para equipos base', url: 'https://www.amazon.com/s?k=Kingston+Fury+8GB+DDR4' },
+            { id: 84, category: 'ram', name: 'ADATA XPG Spectrix D60G RGB 16GB DDR4 3200MHz', brand: 'ADATA', price: 55, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Más del 60% de la superficie con iluminación RGB', url: 'https://speedlogic.com.co/?s=Spectrix+D60G&post_type=product' },
+            { id: 85, category: 'ram', name: 'Corsair Vengeance 64GB (2x32GB) DDR5 5200MHz', brand: 'Corsair', price: 189, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Alta capacidad en dos canales', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Corsair+64GB+DDR5' },
+            { id: 86, category: 'ram', name: 'Thermaltake UX200 SE Memory Cooler + RAM Combo', brand: 'Thermaltake', price: 129, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Kit optimizado con disipador activo', url: 'https://www.amazon.com/s?k=Thermaltake+RAM' },
+            { id: 87, category: 'ram', name: 'Patriot Viper Steel DDR4 16GB 3600MHz', brand: 'Patriot', price: 49, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Diseño clásico en aluminio gris', url: 'https://www.alkosto.com/search?text=Viper+Steel' },
+            { id: 88, category: 'ram', name: 'G.Skill Trident Z5 RGB Series 64GB DDR5 6400MHz', brand: 'G.Skill', price: 239, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Rendimiento supremo con estéticamente impecable', url: 'https://www.amazon.com/s?k=Trident+Z5+RGB+64GB' },
+            { id: 89, category: 'ram', name: 'TeamGroup T-Force Vulcan Z DDR4 32GB 3200MHz', brand: 'TeamGroup', price: 68, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&auto=format&fit=crop&q=80', specs: 'Disipador de bajo perfil rojo o gris', url: 'https://speedlogic.com.co/?s=Vulcan+Z+32GB&post_type=product' },
+            { id: 90, category: 'ram', name: 'Kingston Fury Renegade DDR4 32GB 3600MHz CL16', brand: 'Kingston', price: 92, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1562976540-1e02c914ea6a?w=500&auto=format&fit=crop&q=80', specs: 'Baja latencia para plataformas DDR4 maduras', url: 'https://www.amazon.com/s?k=Fury+Renegade+DDR4' },
+
+            // --- 30 SSDs NVMe M.2 (SSD) ---
+            { id: 91, category: 'ssd', name: 'Samsung 990 PRO 2TB NVMe M.2 2280 PCIe 4.0', brand: 'Samsung', price: 179, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Lectura hasta 7,450 MB/s con disipador', url: 'https://www.amazon.com/s?k=Samsung+990+PRO+2TB' },
+            { id: 92, category: 'ssd', name: 'WD_BLACK SN850X 2TB NVMe M.2 2280 SSD', brand: 'Western Digital', price: 169, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Modo de juego 2.0 integrado, hasta 7,300 MB/s', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=SN850X+2TB' },
+            { id: 93, category: 'ssd', name: 'Crucial T700 2TB Gen5 NVMe M.2 SSD', brand: 'Crucial', price: 249, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Velocidad PCIe Gen5 brutal de hasta 12,400 MB/s', url: 'https://www.amazon.com/s?k=Crucial+T700+2TB' },
+            { id: 94, category: 'ssd', name: 'Kingston KC3000 2TB PCIe 4.0 NVMe M.2', brand: 'Kingston', price: 145, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Controlador Phison E18, alto rendimiento', url: 'https://speedlogic.com.co/?s=KC3000+2TB&post_type=product' },
+            { id: 95, category: 'ssd', name: 'Sabrent Rocket 4 Plus 4TB NVMe M.2 SSD', brand: 'Sabrent', price: 349, store: 'Amazon', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Gran capacidad de almacenamiento ultra rápido', url: 'https://www.amazon.com/s?k=Sabrent+Rocket+4+Plus+4TB' },
+            { id: 96, category: 'ssd', name: 'Lexar NM790 2TB PCIe 4.0 NVMe M.2 SSD', brand: 'Lexar', price: 129, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Hasta 7,400 MB/s con excelente eficiencia', url: 'https://www.alkosto.com/search?text=Lexar+NM790' },
+            { id: 97, category: 'ssd', name: 'Samsung 980 PRO 1TB NVMe M.2 SSD', brand: 'Samsung', price: 99, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'PCIe 4.0 velocidad contrastada', url: 'https://www.amazon.com/s?k=Samsung+980+PRO+1TB' },
+            { id: 98, category: 'ssd', name: 'Corsair MP600 Pro LPX 2TB para PS5 y PC', brand: 'Corsair', price: 159, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Disipador optimizado para ranura de consola', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=MP600+Pro+LPX' },
+            { id: 99, category: 'ssd', name: 'WD Blue SN580 1TB NVMe M.2 SSD', brand: 'Western Digital', price: 69, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'PCIe 4.0 económico sin DRAM', url: 'https://www.amazon.com/s?k=WD+Blue+SN580+1TB' },
+            { id: 100, category: 'ssd', name: 'Kingston NV2 1TB M.2 2280 NVMe SSD', brand: 'Kingston', price: 59, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'El SSD económico más popular del mercado', url: 'https://www.alkosto.com/search?text=Kingston+NV2+1TB' },
+            { id: 101, category: 'ssd', name: 'Seagate FireCuda 530 2TB con Disipador', brand: 'Seagate', price: 189, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Disipador EKWB personalizado', url: 'https://www.amazon.com/s?k=FireCuda+530+2TB' },
+            { id: 102, category: 'ssd', name: 'HP FX900 Pro 2TB NVMe M.2 SSD', brand: 'HP', price: 135, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'PCIe 4.0 rendimiento rápido', url: 'https://speedlogic.com.co/?s=HP+FX900+Pro&post_type=product' },
+            { id: 103, category: 'ssd', name: 'Acer Predator GM7000 2TB NVMe SSD', brand: 'Acer', price: 149, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Con almohadilla térmica de grafeno', url: 'https://www.amazon.com/s?k=Predator+GM7000+2TB' },
+            { id: 104, category: 'ssd', name: 'PNY CS3140 2TB M.2 NVMe Gen4', brand: 'PNY', price: 139, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Velocidades de lectura de 7,500 MB/s', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=PNY+CS3140' },
+            { id: 105, category: 'ssd', name: 'TeamGroup MP33 1TB NVMe PCIe 3.0', brand: 'TeamGroup', price: 54, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'PCIe 3.0 para equipos de gama de entrada', url: 'https://www.amazon.com/s?k=TeamGroup+MP33+1TB' },
+            { id: 106, category: 'ssd', name: 'Samsung 990 EVO 2TB NVMe M.2 SSD', brand: 'Samsung', price: 159, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Soporte híbrido PCIe 4.0 x4 y PCIe 5.0 x2', url: 'https://www.alkosto.com/search?text=Samsung+990+EVO' },
+            { id: 107, category: 'ssd', name: 'Crucial P3 Plus 2TB PCIe 4.0 NVMe M.2', brand: 'Crucial', price: 119, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Capacidad masiva a precio competitivo', url: 'https://www.amazon.com/s?k=Crucial+P3+Plus+2TB' },
+            { id: 108, category: 'ssd', name: 'WD_BLACK SN770 1TB NVMe M.2 SSD', brand: 'Western Digital', price: 79, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Lectura hasta 5,150 MB/s', url: 'https://speedlogic.com.co/?s=SN770+1TB&post_type=product' },
+            { id: 109, category: 'ssd', name: 'Corsair MP700 Pro 2TB PCIe 5.0 SSD', brand: 'Corsair', price: 289, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Rendimiento de próxima generación con disipador', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=MP700+Pro' },
+            { id: 110, category: 'ssd', name: 'Silicon Power UD90 2TB NVMe M.2 SSD', brand: 'Silicon Power', price: 109, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'PCIe 4.0 de alta eficiencia', url: 'https://www.amazon.com/s?k=Silicon+Power+UD90+2TB' },
+            { id: 111, category: 'ssd', name: 'Samsung 870 QVO 2TB 2.5 pulgadas SATA SSD', brand: 'Samsung', price: 149, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Almacenamiento masivo formato SATA tradicional', url: 'https://www.amazon.com/s?k=Samsung+870+QVO+2TB' },
+            { id: 112, category: 'ssd', name: 'Kingston A400 960GB 2.5 SATA SSD', brand: 'Kingston', price: 59, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Ideal para revivir PCs antiguos', url: 'https://www.alkosto.com/search?text=Kingston+A400' },
+            { id: 113, category: 'ssd', name: 'Sabrent Rocket Q4 2TB NVMe PCIe 4.0', brand: 'Sabrent', price: 159, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Memoria QLC de alto rendimiento', url: 'https://www.amazon.com/s?k=Sabrent+Rocket+Q4' },
+            { id: 114, category: 'ssd', name: 'Lexar Professional NM800PRO 2TB con Disipador', brand: 'Lexar', price: 145, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Disipador térmico de aluminio incluido', url: 'https://speedlogic.com.co/?s=NM800PRO&post_type=product' },
+            { id: 115, category: 'ssd', name: 'WD_BLACK SN850X 4TB con Disipador', brand: 'Western Digital', price: 379, store: 'Best Buy', stock: 'Stock Bajo', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Capacidad extrema para bibliotecas gigantes de juegos', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=SN850X+4TB' },
+            { id: 116, category: 'ssd', name: 'HP S350 500GB 2.5 SATA SSD', brand: 'HP', price: 38, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'SATA de alta durabilidad', url: 'https://www.amazon.com/s?k=HP+S350+500GB' },
+            { id: 117, category: 'ssd', name: 'Crucial T500 2TB Gen4 NVMe M.2 SSD', brand: 'Crucial', price: 154, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Lectura hasta 7,300 MB/s optimizado para laptops y PC', url: 'https://www.alkosto.com/search?text=Crucial+T500' },
+            { id: 118, category: 'ssd', name: 'Gigabyte AORUS Gen4 7300 2TB SSD', brand: 'Gigabyte', price: 149, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Disipador de nanocarbono térmico', url: 'https://www.amazon.com/s?k=AORUS+Gen4+7300' },
+            { id: 119, category: 'ssd', name: 'TeamGroup Cardea A440 Pro 2TB', brand: 'TeamGroup', price: 159, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'Disipador de aluminio ultra delgado', url: 'https://speedlogic.com.co/?s=Cardea+A440&post_type=product' },
+            { id: 120, category: 'ssd', name: 'Samsung 990 PRO 4TB NVMe M.2 SSD', brand: 'Samsung', price: 349, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&auto=format&fit=crop&q=80', specs: 'El SSD insignia de máxima capacidad y velocidad', url: 'https://www.amazon.com/s?k=Samsung+990+PRO+4TB' },
+
+            // --- 30 Coolers & AIO (Cooler) ---
+            { id: 121, category: 'cooler', name: 'ASUS ROG Ryujin III 360 ARGB White Edition AIO', brand: 'ASUS ROG', price: 359, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Pantalla LCD 3.5", bomba Asetek 8ª gen', url: 'https://www.amazon.com/s?k=ROG+Ryujin+III+360' },
+            { id: 122, category: 'cooler', name: 'NZXT Kraken Elite 360 RGB Liquid Cooler', brand: 'NZXT', price: 299, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Pantalla LCD panorámica IPS de 2.36 pulgadas', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Kraken+Elite+360' },
+            { id: 123, category: 'cooler', name: 'Corsair iCUE Link H160i LCD Liquid Cooler', brand: 'Corsair', price: 329, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Sistema de cableado simplificado iCUE Link', url: 'https://www.amazon.com/s?k=Corsair+H160i+LCD' },
+            { id: 124, category: 'cooler', name: 'Thermalright Peerless Assassin 120 SE ARGB', brand: 'Thermalright', price: 39, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Disipador por aire de doble torre legendario', url: 'https://www.amazon.com/s?k=Thermalright+Peerless+Assassin+120' },
+            { id: 125, category: 'cooler', name: 'DeepCool AK620 Digital CPU Air Cooler', brand: 'DeepCool', price: 69, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Pantalla digital de temperatura en tiempo real', url: 'https://speedlogic.com.co/?s=AK620+Digital&post_type=product' },
+            { id: 126, category: 'cooler', name: 'MSI MAG CoreLiquid 360R V2 ARGB', brand: 'MSI', price: 119, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Bomba integrada en el radiador para reducir vibraciones', url: 'https://www.alkosto.com/search?text=MAG+CoreLiquid' },
+            { id: 127, category: 'cooler', name: 'Lian Li Galahad II Trinity Performance 360', brand: 'Lian Li', price: 169, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Ventiladores de alto rendimiento espesor 32mm', url: 'https://www.amazon.com/s?k=Galahad+II+Performance' },
+            { id: 128, category: 'cooler', name: 'Noctua NH-D15 chromax.black Dual-Tower Cooler', brand: 'Noctua', price: 119, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'El referente mundial en enfriamiento por aire silencioso', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Noctua+NH-D15' },
+            { id: 129, category: 'cooler', name: 'ASUS ROG Strix LC II 360 ARGB', brand: 'ASUS ROG', price: 219, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Bomba con logo ROG iluminado ARGB', url: 'https://www.amazon.com/s?k=ROG+Strix+LC+II+360' },
+            { id: 130, category: 'cooler', name: 'Arctic Liquid Freezer III 360 AIO Water Cooler', brand: 'Arctic', price: 109, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'VRM cooling fan integrado en el bloque', url: 'https://www.amazon.com/s?k=Arctic+Liquid+Freezer+III+360' },
+            { id: 131, category: 'cooler', name: 'Cooler Master MasterLiquid 360 Atmos', brand: 'Cooler Master', price: 139, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Diseño ecológico con componentes reciclados', url: 'https://speedlogic.com.co/?s=MasterLiquid+Atmos&post_type=product' },
+            { id: 132, category: 'cooler', name: 'ID-COOLING SE-214-XT ARGB CPU Cooler', brand: 'ID-Cooling', price: 21, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Disipador económico con iluminación ARGB', url: 'https://www.alkosto.com/search?text=ID-Cooling' },
+            { id: 133, category: 'cooler', name: 'Be Quiet! Dark Rock Pro 5 Air Cooler', brand: 'Be Quiet!', price: 99, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Funcionamiento extremadamente silencioso', url: 'https://www.amazon.com/s?k=Dark+Rock+Pro+5' },
+            { id: 134, category: 'cooler', name: 'NZXT T120 RGB Air Cooler White', brand: 'NZXT', price: 49, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Diseño minimalista blanco compatible con gabinetes H', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=NZXT+T120' },
+            { id: 135, category: 'cooler', name: 'Corsair H100x RGB Elite Liquid Cooler', brand: 'Corsair', price: 99, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Radiador de 240mm con ventiladores SP120 Elite', url: 'https://www.amazon.com/s?k=Corsair+H100x' },
+            { id: 136, category: 'cooler', name: 'Thermalright Phantom Spirit 120 SE', brand: 'Thermalright', price: 35, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: '7 tubos de calor de alto rendimiento', url: 'https://speedlogic.com.co/?s=Phantom+Spirit+120&post_type=product' },
+            { id: 137, category: 'cooler', name: 'DeepCool Assassin IV Premium Air Cooler', brand: 'DeepCool', price: 99, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Estética futurista en forma de cubo negro', url: 'https://www.amazon.com/s?k=DeepCool+Assassin+IV' },
+            { id: 138, category: 'cooler', name: 'MSI CoreLiquid E360 Black AIO', brand: 'MSI', price: 139, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Bloque con diseño inspirado en relojes de sol', url: 'https://www.alkosto.com/search?text=CoreLiquid+E360' },
+            { id: 139, category: 'cooler', name: 'Noctua NH-U12S redux CPU Cooler', brand: 'Noctua', price: 54, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Disipador compacto de 120mm accesible', url: 'https://www.amazon.com/s?k=Noctua+NH-U12S+redux' },
+            { id: 140, category: 'cooler', name: 'Lian Li Hydroshift LCD 360S', brand: 'Lian Li', price: 239, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Enfriamiento líquido con tubos ocultos e IPS', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Hydroshift+360' },
+            { id: 141, category: 'cooler', name: 'Thermaltake TH360 V2 ARGB Sync', brand: 'Thermaltake', price: 89, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Bomba renovada con iluminación espejo infinito', url: 'https://www.amazon.com/s?k=Thermaltake+TH360+V2' },
+            { id: 142, category: 'cooler', name: 'Vetroo V5 CPU Air Cooler White', brand: 'Vetroo', price: 29, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: '5 tubos de calor directos y ventilador ARGB', url: 'https://speedlogic.com.co/?s=Vetroo+V5&post_type=product' },
+            { id: 143, category: 'cooler', name: 'Be Quiet! Pure Loop 2 360mm AIO', brand: 'Be Quiet!', price: 129, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Bomba doblemente desacoplada y recargable', url: 'https://www.amazon.com/s?k=Pure+Loop+2+360' },
+            { id: 144, category: 'cooler', name: 'Cooler Master Hyper 212 Halo White', brand: 'Cooler Master', price: 39, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'El icónico Hyper 212 renovado con ventilador Halo', url: 'https://www.alkosto.com/search?text=Hyper+212+Halo' },
+            { id: 145, category: 'cooler', name: 'DeepCool LE520 ARGB Liquid Cooler 240mm', brand: 'DeepCool', price: 75, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Tecnología antiderrame de alta seguridad', url: 'https://www.amazon.com/s?k=DeepCool+LE520' },
+            { id: 146, category: 'cooler', name: 'Arctic Freezer 34 eSports Duo', brand: 'Arctic', price: 49, store: 'Best Buy', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Configuración en push-pull con ventiladores BioniX', url: 'https://www.bestbuy.com/site/searchpage.jsp?st=Freezer+34+eSports' },
+            { id: 147, category: 'cooler', name: 'SilverStone IceMyst 360 AIO', brand: 'SilverStone', price: 135, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Permite añadir ventiladores adicionales en el bloque', url: 'https://www.amazon.com/s?k=SilverStone+IceMyst+360' },
+            { id: 148, category: 'cooler', name: 'ID-COOLING FROSTFLOW X 240', brand: 'ID-Cooling', price: 65, store: 'Speed Logic', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Refrigeración líquida básica de gran rendimiento', url: 'https://speedlogic.com.co/?s=FROSTFLOW+240&post_type=product' },
+            { id: 149, category: 'cooler', name: 'NZXT Kraken 240 RGB', brand: 'NZXT', price: 159, store: 'Amazon', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Pantalla LCD de 1.54 pulgadas para GIFs y métricas', url: 'https://www.amazon.com/s?k=NZXT+Kraken+240+RGB' },
+            { id: 150, category: 'cooler', name: 'Noctua NH-L9a-AM4 Low Profile Air Cooler', brand: 'Noctua', price: 49, store: 'Alkosto', stock: 'En Stock', image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=500&auto=format&fit=crop&q=80', specs: 'Ultra bajo perfil para gabinetes mini ITX', url: 'https://www.alkosto.com/search?text=Noctua+NH-L9a' }
+        ];
+
+        let cart = [];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (tabId === 'catalog') renderCatalog();
+            if (tabId === 'compare') populateCompareDropdowns();
+        }
+
+        function selectCatAndSwitch(cat) {
+            const selectCat = document.getElementById('catalog-filter-cat');
+            if (selectCat) selectCat.value = cat;
+            switchTab('catalog');
+        }
+
+        function executeGlobalSearch() {
+            const query = document.getElementById('global-search-input').value.toLowerCase();
+            const cat = document.getElementById('global-category-select').value;
+            const selectCat = document.getElementById('catalog-filter-cat');
+            if (selectCat) selectCat.value = cat;
+            switchTab('catalog');
+
+            const filtered = products.filter(p => {
+                const matchQuery = p.name.toLowerCase().includes(query) || p.brand.toLowerCase().includes(query);
+                const matchCat = cat === 'all' || p.category === cat;
+                return matchQuery && matchCat;
+            });
+            renderCatalogCustom(filtered);
+        }
+
+        function renderCatalog() {
+            const catFilter = document.getElementById('catalog-filter-cat')?.value || 'all';
+            const storeFilter = document.getElementById('catalog-filter-store')?.value || 'all';
+
+            const filtered = products.filter(p => {
+                const matchCat = catFilter === 'all' || p.category === catFilter;
+                const matchStore = storeFilter === 'all' || p.store === storeFilter;
+                return matchCat && matchStore;
+            });
+
+            renderCatalogCustom(filtered);
+        }
+
+        function renderCatalogCustom(items) {
+            const grid = document.getElementById('catalog-grid');
+            if (!grid) return;
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-500 font-orbitron">No se encontraron componentes con los filtros seleccionados.</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(p => `
+                <div class="rog-glow-card rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="h-36 rounded-lg overflow-hidden mb-3 relative bg-zinc-950 flex items-center justify-center">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover opacity-80">
+                            <span class="absolute top-2 left-2 bg-zinc-900/90 text-purple-400 text-[10px] px-2 py-0.5 rounded font-orbitron font-bold border border-purple-500/30">${p.store}</span>
+                            <span class="absolute top-2 right-2 bg-green-900/90 text-green-300 text-[10px] px-2 py-0.5 rounded font-semibold">${p.stock}</span>
+                        </div>
+                        <span class="text-[10px] text-zinc-400 uppercase font-orbitron tracking-wider">${p.brand}</span>
+                        <h3 class="font-orbitron font-bold text-sm mb-2 line-clamp-2 text-zinc-100">${p.name}</h3>
+                        <p class="text-[11px] text-zinc-400 mb-3 line-clamp-2"><i class="fa-solid fa-microchip text-purple-400 mr-1"></i>${p.specs}</p>
+                    </div>
+                    <div class="pt-3 border-t border-zinc-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-zinc-500 block">PRECIO RECONOCIDO</span>
+                            <span class="text-lg font-black font-orbitron text-purple-400">$${p.price.toLocaleString()} USD</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="${p.url}" target="_blank" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 p-2.5 rounded-lg text-xs font-orbitron transition flex items-center justify-center" title="Ir directo al producto">
+                                <i class="fa-solid fa-external-link"></i>
+                            </a>
+                            <button onclick="addToCart(${p.id})" class="bg-gradient-to-r from-purple-600 to-red-600 text-white p-2.5 rounded-lg text-xs font-orbitron font-bold transition" title="Añadir al carrito">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateCompareDropdowns() {
+            const sel1 = document.getElementById('compare-select-1');
+            const sel2 = document.getElementById('compare-select-2');
+            if (!sel1 || !sel2) return;
+            
+            const optionsHtml = '<option value="">Seleccionar componente...</option>' + products.map(p => `<option value="${p.id}">${p.name} (${p.store} - $${p.price})</option>`).join('');
+            sel1.innerHTML = optionsHtml;
+            sel2.innerHTML = optionsHtml;
+        }
+
+        function updateComparison() {
+            const id1 = document.getElementById('compare-select-1').value;
+            const id2 = document.getElementById('compare-select-2').value;
+            const resContainer = document.getElementById('comparison-result');
+            if (!resContainer) return;
+
+            const p1 = products.find(x => x.id == id1);
+            const p2 = products.find(x => x.id == id2);
+
+            let html1 = p1 ? `
+                <div class="bg-zinc-950 p-6 rounded-xl border border-purple-500/50 space-y-3">
+                    <h3 class="font-orbitron font-bold text-base text-purple-300">${p1.name}</h3>
+                    <p class="text-xs text-zinc-400"><b>Tienda:</b> ${p1.store}</p>
+                    <p class="text-xs text-zinc-400"><b>Precio:</b> $${p1.price} USD</p>
+                    <p class="text-xs text-zinc-400"><b>Specs:</b> ${p1.specs}</p>
+                    <a href="${p1.url}" target="_blank" class="inline-block mt-2 bg-purple-600 text-white px-3 py-1.5 rounded text-xs font-orbitron">Ver en tienda <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                </div>` : `<div class="bg-zinc-950 p-6 rounded-xl border border-zinc-800 text-center text-zinc-500 font-orbitron text-sm">Selecciona Producto 1</div>`;
+
+            let html2 = p2 ? `
+                <div class="bg-zinc-950 p-6 rounded-xl border border-red-500/50 space-y-3">
+                    <h3 class="font-orbitron font-bold text-base text-red-300">${p2.name}</h3>
+                    <p class="text-xs text-zinc-400"><b>Tienda:</b> ${p2.store}</p>
+                    <p class="text-xs text-zinc-400"><b>Precio:</b> $${p2.price} USD</p>
+                    <p class="text-xs text-zinc-400"><b>Specs:</b> ${p2.specs}</p>
+                    <a href="${p2.url}" target="_blank" class="inline-block mt-2 bg-red-600 text-white px-3 py-1.5 rounded text-xs font-orbitron">Ver en tienda <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                </div>` : `<div class="bg-zinc-950 p-6 rounded-xl border border-zinc-800 text-center text-zinc-500 font-orbitron text-sm">Selecciona Producto 2</div>`;
+
+            resContainer.innerHTML = html1 + html2;
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                cart.push(product);
+                updateCartUI();
+                alert(`¡${product.name} guardado en el carrito!`);
+            }
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cart-badge');
+            if (badge) badge.innerText = cart.length;
+            const container = document.getElementById('cart-items-container');
+            if (!container) return;
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-xs text-zinc-500 text-center py-4 font-orbitron">El carrito está vacío.</p>`;
+                document.getElementById('cart-total').innerText = '$0.00';
+                return;
+            }
+
+            container.innerHTML = cart.map((item, index) => {
+                total += item.price;
+                return `
+                    <div class="flex justify-between items-center bg-zinc-950 p-3 rounded-xl border border-zinc-800 text-xs gap-2">
+                        <div>
+                            <span class="font-bold block text-white">${item.name}</span>
+                            <span class="text-[10px] text-purple-400">${item.store} - $${item.price} USD</span>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-white"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+            }).join('');
+            document.getElementById('cart-total').innerText = `$${total.toLocaleString()} USD`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function openCartModal() { document.getElementById('cart-modal').classList.remove('hidden'); }
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>
